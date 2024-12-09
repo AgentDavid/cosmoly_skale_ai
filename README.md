@@ -1,79 +1,135 @@
-# Demo Cross-Chain contract Swisstronik <-> Bsc Testnet
+# CosmolyAI Smart Contract
 
 ## Overview
-This project demonstrates basic Cross-Chain contract which is using Hyperlane Mailbox to broadcast messages across chains.
 
-The contract itself can be found here: [SampleCrossChainCounter.sol](/hyperlane_sample_crosschain_contract/contracts/SampleCrossChainCounter.sol)
+The **CosmolyAI** smart contract is designed to manage user interactions, including submitting cryptocurrency predictions, validating those predictions, rewarding or penalizing users based on accuracy, and enabling decentralized governance via voting. It also integrates a credit system to facilitate participation in the platform.
 
-## Useful links
+### Key Features
 
-- Swisstronik Faucet: https://faucet.testnet.swisstronik.com
-- BSC Testnet Faucet: https://www.bnbchain.org/en/testnet-faucet
+- **User Predictions & Opinions**: Users can submit predictions about the price movement of cryptocurrencies.
+- **Prediction Validation**: Admin can validate user predictions and reward or penalize users based on their accuracy.
+- **Governance Voting**: Users can participate in governance decisions, where votes are weighted based on the user's credits.
+- **Credit System**: Credits are used for submitting opinions and voting. Admins can assign or consume credits from users.
 
-## Socials
+---
 
-- Discord: https://link.swisstronik.com/a46c36
-- Twitter: https://twitter.com/swisstronik
+## Contract Functions
 
-## Build
-Install dependencies:
-```sh
-npm install
+1. **User Interaction**:
+
+   - `submitOpinion(cryptocurrency, prediction)`: Users can submit a prediction on whether a cryptocurrency will go up or down. Requires at least 10 credits.
+   - `validatePrediction(index, isCorrect)`: Admin validates a prediction and rewards or penalizes the user. Rewards are 5 credits for correct predictions, 6 credits are deducted for incorrect predictions.
+
+2. **Governance**:
+
+   - `createProposal(description)`: Admin can create governance proposals.
+   - `vote(proposalId, support)`: Users can vote on governance proposals. Voting power is determined by the user's credits.
+   - `executeProposal(proposalId)`: Admin executes the proposal after the voting period ends, determining if it passes based on votes.
+
+3. **Credit Management**:
+   - `assignCredits(user, amount)`: Admin can assign credits to a user.
+   - `consumeCredits(user, amount)`: Admin can consume credits from a user.
+
+---
+
+## Installation
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v20.0.0 or later)
+- [Hardhat](https://hardhat.org/) (for deploying and interacting with smart contracts)
+- [pnpm](https://pnpm.io/) (for run commands and packages manager)
+- [ethers.js](https://docs.ethers.io/v5/)
+
+### Setup
+
+1. Clone the repository to your local machine:
+
+   ```bash
+   git clone github.com/AgentDavid/cosmoly_skale_node
+   cd cosmoly_skale_node
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root of the project and add the necessary environment variables:
+
+   ```env
+   DEPLOYER_KEY=<Your Deployer Private Key>
+   SKALE_RPC=<Your Skale RPC URL>
+   COSMOLYAI_CONTRACT_ADDRESS=<Your CosmolyAI Contract Address>
+   ADMIN_ACCOUNT=<Admin Account Private Key>
+   USER_ACCOUNT=<User Account Private Key>
+   ```
+
+---
+
+## Deployment
+
+To deploy the contract to the network, run the deployment script:
+
+```bash
+pnpm run deploy
 ```
-Compile contracts:
-```sh
-npm run compile
+
+- The contract will be deployed to the specified network, and the contract address will be logged in the console.
+
+---
+
+## Scripts
+
+### 1. **/scripts/deploy.ts**
+
+This script deploys the **CosmolyAI** smart contract to the specified network.
+
+```bash
+pnpm run deploy
 ```
 
-## Deploy
-We will deploy 2 instances of `SampleCrossChainCounter`, one in Swisstronik and one in BSC Testnet.
+### 2. **/scripts/assignAndConsumeCredits.ts**
 
-Before deployment, create `.env` file by running the following command:
-```sh
-cp .env.sample .env
-```
-Then, in `.env` file, fill `DEPLOYER_KEY` env var with private key, which will be used to deploy contracts in both networks. Account, associated with this private key, should be funded in both networks.
+This script tests the functionality for assigning and consuming credits for users.
 
-Optional - 
-
-When `.env` file is fulfilled, you can deploy contracts using the following command:
-```sh
-npm run deploy
-```
-Command above will output you contract addresses in both networks. If you want, you can use those custom deployed contracts with your .env file.
-
-## Interact
-
-We've prepared multiple scripts for interaction with deployed contracts.
-
-You can use these scripts with already deployed contracts.
-However,if you wish you can deploy your own and update contract addresses in .env file to addresses of deployed contracts.
-
-- `BSC_TESTNET_CONTRACT_ADDRESS` should be filled with address of `SampleCrossChainCounter` deployed in BSC Testnet
-- `SWISSTRONIK_CONTRACT_ADDRESS` should be filled with address of `SampleCrossChainCounter` deployed in Swisstronik
-
-### Increment counter in BSC Testnet
-
-We will start from incrementing counter in BSC Testnet network. You can use the command below:
-```sh
-npm run increment:bsctestnet
-```
-The command above will output you previous and new value of counter. During the counter update, the contract calls `dispatch` function at Hyperlane Mailbox to increment value at Swisstronik `SampleCrossChainCounter` instance also.
-
-The cross-chain transaction takes about 1 minute. You can check, if cross-chain transaction was succeed by checking state of Swisstronik's instance. You can use command below to check counter state in Swisstronik:
-```sh
-npm run counter:swisstronik
+```bash
+pnpm run assignAndConsumeCredits
 ```
 
-### Increment counter in Swisstronik Network
+### 3. **/scripts/voteAndCreateProposal.ts**
 
-To increment counter in Swisstronik and sync its value with BSC Testnet instance, you can use the following command:
-```sh
-npm run increment:swisstronik
-```
-The command above works the same as in BSC Testnet, but now Swisstronik instance calls Hyperlane Mailbox, deployed in Swisstronik, to initiate cross-chain transaction.
+This script allows you to create a proposal and then vote on it. The admin creates the proposal and users vote with their credits.
 
-You can check if cross-chain transaction from Swisstronik to BSC Testnet was succeed by running the following command:
-```sh
-npm run counter:bsctestnet
+```bash
+pnpm run voteAndCreateProposal
 ```
+
+### 4. **/scripts/validatePrediction.ts**
+
+This script is for the admin, who validates whether a prediction is correct and rewards or penalizes the user.
+
+```bash
+pnpm run validatePrediction
+```
+
+---
+
+## Interacting with the Contract
+
+Once the contract is deployed and the necessary environment variables are set, you can interact with the contract using the provided scripts. You can:
+
+1. **Assign credits to users** using the `assignCredits` function.
+2. **Consume credits from users** using the `consumeCredits` function.
+3. **Submit predictions** using the `submitOpinion` function (requires at least 10 credits).
+4. **Validate predictions** using the `validatePrediction` function (only accessible by the admin).
+5. **Create and vote on proposals** for governance.
+
+---
+
+## Conclusion
+
+The **CosmolyAI** smart contract facilitates a decentralized prediction system, governance voting, and a credit-based reward system. By using the provided deployment and interaction scripts, you can test and deploy the contract on your desired blockchain network.
+
+If you encounter any issues, please refer to the [Hardhat documentation](https://hardhat.org/) or raise an issue in the repository.
