@@ -128,7 +128,7 @@ Once the contract is deployed and the necessary environment variables are set, y
 
 ---
 
-## Conclusion
+## For a better decentralized future
 
 The **CosmolyAI** smart contract facilitates a decentralized prediction system, governance voting, and a credit-based reward system. By using the provided deployment and interaction scripts, you can test and deploy the contract on your desired blockchain network.
 
